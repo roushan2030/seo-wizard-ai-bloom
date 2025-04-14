@@ -17,7 +17,7 @@ const CTA = () => {
             <Button className="bg-white text-seo-purple hover:bg-gray-100 hover:text-seo-purple-dark px-8 py-6 text-lg">
               Start Your Free Trial <ArrowRight size={18} className="ml-2" />
             </Button>
-            <Button variant="outline" className="border-white text-white hover:bg-white/10 px-8 py-6 text-lg">
+            <Button variant="outline" className="bg-[#FFDEE2] text-black border-black hover:bg-[#FFDEE2]/80 px-8 py-6 text-lg">
               Schedule a Demo
             </Button>
           </div>
@@ -31,3 +31,4 @@ const CTA = () => {
 };
 
 export default CTA;
+
