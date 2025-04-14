@@ -1,14 +1,22 @@
 
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
+import { useAuth } from '@/context/AuthContext';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
   };
 
   return (
@@ -26,12 +34,28 @@ const Header = () => {
           <Link to="/pricing" className="text-gray-700 hover:text-seo-purple transition">Pricing</Link>
           <Link to="/blog" className="text-gray-700 hover:text-seo-purple transition">Blog</Link>
           <div className="flex items-center space-x-4">
-            <Link to="/login">
-              <Button variant="outline">Log in</Button>
-            </Link>
-            <Link to="/signup">
-              <Button className="bg-seo-purple hover:bg-seo-purple-dark text-white">Sign up free</Button>
-            </Link>
+            {isAuthenticated ? (
+              <>
+                <Link to="/dashboard">
+                  <Button variant="outline">Dashboard</Button>
+                </Link>
+                <Button 
+                  className="bg-seo-purple hover:bg-seo-purple-dark text-white"
+                  onClick={handleLogout}
+                >
+                  Log out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Link to="/login">
+                  <Button variant="outline">Log in</Button>
+                </Link>
+                <Link to="/signup">
+                  <Button className="bg-seo-purple hover:bg-seo-purple-dark text-white">Sign up free</Button>
+                </Link>
+              </>
+            )}
           </div>
         </nav>
 
@@ -72,12 +96,31 @@ const Header = () => {
               Blog
             </Link>
             <div className="flex flex-col space-y-2 pt-2 border-t border-gray-100">
-              <Link to="/login" onClick={() => setIsMenuOpen(false)}>
-                <Button variant="outline" className="w-full">Log in</Button>
-              </Link>
-              <Link to="/signup" onClick={() => setIsMenuOpen(false)}>
-                <Button className="w-full bg-seo-purple hover:bg-seo-purple-dark text-white">Sign up free</Button>
-              </Link>
+              {isAuthenticated ? (
+                <>
+                  <Link to="/dashboard" onClick={() => setIsMenuOpen(false)}>
+                    <Button variant="outline" className="w-full">Dashboard</Button>
+                  </Link>
+                  <Button 
+                    className="w-full bg-seo-purple hover:bg-seo-purple-dark text-white"
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      handleLogout();
+                    }}
+                  >
+                    Log out
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Link to="/login" onClick={() => setIsMenuOpen(false)}>
+                    <Button variant="outline" className="w-full">Log in</Button>
+                  </Link>
+                  <Link to="/signup" onClick={() => setIsMenuOpen(false)}>
+                    <Button className="w-full bg-seo-purple hover:bg-seo-purple-dark text-white">Sign up free</Button>
+                  </Link>
+                </>
+              )}
             </div>
           </nav>
         </div>

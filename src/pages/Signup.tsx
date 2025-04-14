@@ -1,11 +1,12 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
+import { useAuth } from "@/context/AuthContext";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -16,6 +17,8 @@ const Signup = () => {
     agreeTerms: false
   });
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const { signup } = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -26,7 +29,7 @@ const Signup = () => {
     setFormData(prev => ({ ...prev, agreeTerms: checked }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.agreeTerms) {
@@ -36,14 +39,23 @@ const Signup = () => {
     
     setIsLoading(true);
 
-    // Simulate account creation
-    setTimeout(() => {
-      console.log("Signup data:", formData);
-      toast.success("Account created successfully!");
+    try {
+      const success = await signup(
+        formData.email, 
+        formData.password, 
+        formData.firstName, 
+        formData.lastName
+      );
+      
+      if (success) {
+        toast.success("Account created successfully!");
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      console.error("Signup error:", error);
+    } finally {
       setIsLoading(false);
-      // In a real app, you would redirect after successful signup
-      window.location.href = "/dashboard";
-    }, 1500);
+    }
   };
 
   return (

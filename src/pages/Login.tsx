@@ -1,28 +1,40 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
+import { useAuth } from "@/context/AuthContext";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Get the page they were trying to visit
+  const from = (location.state as { from?: { pathname: string } })?.from?.pathname || "/dashboard";
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate authentication
-    setTimeout(() => {
-      console.log("Login attempt:", { email, password });
-      toast.success("Successfully logged in!");
+    try {
+      const success = await login(email, password);
+      
+      if (success) {
+        toast.success("Successfully logged in!");
+        // Navigate to the page they were trying to access, or dashboard as default
+        navigate(from, { replace: true });
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+    } finally {
       setIsLoading(false);
-      // In a real app, you would redirect after successful login
-      window.location.href = "/dashboard";
-    }, 1500);
+    }
   };
 
   return (

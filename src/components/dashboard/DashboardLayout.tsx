@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Outlet, Link, useLocation } from "react-router-dom";
+import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   BarChart3,
@@ -27,6 +27,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/context/AuthContext";
 
 interface SidebarItemProps {
   icon: React.ElementType;
@@ -54,7 +55,9 @@ const SidebarItem = ({ icon: Icon, label, to, active }: SidebarItemProps) => {
 
 const DashboardLayout = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { user, logout } = useAuth();
 
   const navItems = [
     { icon: BarChart3, label: "Dashboard", to: "/dashboard" },
@@ -66,6 +69,22 @@ const DashboardLayout = () => {
   ];
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
+  
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
+  // Extract user initials for avatar fallback
+  const getInitials = () => {
+    if (!user) return "?";
+    
+    if (user.firstName && user.lastName) {
+      return `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
+    }
+    
+    return user.email.substring(0, 2).toUpperCase();
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -98,12 +117,12 @@ const DashboardLayout = () => {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="w-full justify-start gap-3 px-3 py-2 text-base">
                 <Avatar className="h-7 w-7">
-                  <AvatarImage src="https://placehold.co/200x200/9b87f5/ffffff?text=JD" alt="User" />
-                  <AvatarFallback>JD</AvatarFallback>
+                  <AvatarImage src={`https://placehold.co/200x200/9b87f5/ffffff?text=${getInitials()}`} alt={user?.email || 'User'} />
+                  <AvatarFallback>{getInitials()}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1 text-left">
-                  <p className="text-sm font-medium">John Doe</p>
-                  <p className="text-xs text-gray-500">johndoe@example.com</p>
+                  <p className="text-sm font-medium">{user?.firstName || user?.email || 'User'}</p>
+                  <p className="text-xs text-gray-500">{user?.email}</p>
                 </div>
                 <ChevronDown className="h-4 w-4 text-gray-500" />
               </Button>
@@ -124,7 +143,7 @@ const DashboardLayout = () => {
                 <span>Notifications</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Log out</span>
               </DropdownMenuItem>
@@ -164,17 +183,24 @@ const DashboardLayout = () => {
               ))}
             </nav>
             <div className="border-t border-gray-200 pt-4">
-              <Button variant="ghost" className="w-full justify-start gap-3 px-3 py-2 text-base">
+              <Button 
+                variant="ghost" 
+                className="w-full justify-start gap-3 px-3 py-2 text-base"
+                onClick={handleLogout}
+              >
+                <LogOut className="h-5 w-5 text-gray-500" />
+                Log out
+              </Button>
+              <div className="mt-4 flex items-center gap-3 px-3">
                 <Avatar className="h-7 w-7">
-                  <AvatarImage src="https://placehold.co/200x200/9b87f5/ffffff?text=JD" alt="User" />
-                  <AvatarFallback>JD</AvatarFallback>
+                  <AvatarImage src={`https://placehold.co/200x200/9b87f5/ffffff?text=${getInitials()}`} alt={user?.email || 'User'} />
+                  <AvatarFallback>{getInitials()}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1 text-left">
-                  <p className="text-sm font-medium">John Doe</p>
-                  <p className="text-xs text-gray-500">johndoe@example.com</p>
+                  <p className="text-sm font-medium">{user?.firstName || user?.email || 'User'}</p>
+                  <p className="text-xs text-gray-500">{user?.email}</p>
                 </div>
-                <ChevronRight className="h-4 w-4 text-gray-500" />
-              </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -198,8 +224,8 @@ const DashboardLayout = () => {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-9 w-9 p-0">
                   <Avatar className="h-7 w-7">
-                    <AvatarImage src="https://placehold.co/200x200/9b87f5/ffffff?text=JD" alt="User" />
-                    <AvatarFallback>JD</AvatarFallback>
+                    <AvatarImage src={`https://placehold.co/200x200/9b87f5/ffffff?text=${getInitials()}`} alt={user?.email || 'User'} />
+                    <AvatarFallback>{getInitials()}</AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
@@ -215,7 +241,7 @@ const DashboardLayout = () => {
                   <span>Settings</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLogout}>
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Log out</span>
                 </DropdownMenuItem>
