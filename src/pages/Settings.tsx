@@ -21,6 +21,15 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
 
+// Define the Profile type to match our database structure
+type Profile = {
+  id: string;
+  first_name: string | null;
+  last_name: string | null;
+  company: string | null;
+  bio: string | null;
+}
+
 const Settings = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("profile");
@@ -39,6 +48,7 @@ const Settings = () => {
 
       setLoading(true);
       try {
+        // Use type assertion to help TypeScript understand the structure
         const { data, error } = await supabase
           .from('profiles')
           .select('*')
@@ -49,12 +59,14 @@ const Settings = () => {
           toast.error("Error fetching profile");
           console.error(error);
         } else if (data) {
+          // Use the retrieved data with type safety
+          const profileData = data as Profile;
           setProfile({
-            firstName: data.first_name || "",
-            lastName: data.last_name || "",
+            firstName: profileData.first_name || "",
+            lastName: profileData.last_name || "",
             email: user.email || "",
-            company: data.company || "",
-            bio: data.bio || ""
+            company: profileData.company || "",
+            bio: profileData.bio || ""
           });
         }
       } catch (error) {
@@ -76,6 +88,7 @@ const Settings = () => {
 
     setLoading(true);
     try {
+      // Use type assertion to help TypeScript understand the structure
       const { error } = await supabase
         .from('profiles')
         .upsert({
@@ -84,7 +97,7 @@ const Settings = () => {
           last_name: profile.lastName,
           company: profile.company,
           bio: profile.bio
-        });
+        } as Profile);
 
       if (error) {
         toast.error("Error updating profile");
