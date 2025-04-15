@@ -13,6 +13,7 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import NotFound from "./pages/NotFound";
+import PricingPage from "./pages/PricingPage";
 
 // Dashboard
 import DashboardLayout from "./components/dashboard/DashboardLayout";
@@ -38,6 +39,7 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
+              <Route path="/pricing" element={<PricingPage />} />
               
               {/* Protected Dashboard Routes */}
               <Route element={<ProtectedRoute />}>
