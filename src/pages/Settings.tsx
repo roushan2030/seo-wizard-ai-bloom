@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -18,13 +17,81 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/context/AuthContext";
 
 const Settings = () => {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("profile");
-  
-  const handleSave = () => {
-    toast.success("Settings saved successfully!");
+  const [profile, setProfile] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    company: "",
+    bio: ""
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!user) return;
+
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (error) {
+        toast.error("Error fetching profile");
+        console.error(error);
+      } else if (data) {
+        setProfile({
+          firstName: data.first_name || "",
+          lastName: data.last_name || "",
+          email: user.email || "",
+          company: data.company || "",
+          bio: data.bio || ""
+        });
+      }
+      setLoading(false);
+    };
+
+    fetchProfile();
+  }, [user]);
+
+  const handleSave = async () => {
+    if (!user) {
+      toast.error("User not authenticated");
+      return;
+    }
+
+    setLoading(true);
+    const { error } = await supabase
+      .from('profiles')
+      .upsert({
+        id: user.id,
+        first_name: profile.firstName,
+        last_name: profile.lastName,
+        company: profile.company,
+        bio: profile.bio
+      });
+
+    if (error) {
+      toast.error("Error updating profile");
+      console.error(error);
+    } else {
+      toast.success("Profile updated successfully!");
+    }
+    setLoading(false);
   };
+
+  const handleInputChange = (field: keyof typeof profile, value: string) => {
+    setProfile(prev => ({ ...prev, [field]: value }));
+  };
+
+  if (loading) return <div>Loading...</div>;
 
   return (
     <div className="p-4 md:p-8">
@@ -55,25 +122,39 @@ const Settings = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">First Name</label>
-                  <Input defaultValue="John" />
+                  <Input 
+                    value={profile.firstName}
+                    onChange={(e) => handleInputChange('firstName', e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Last Name</label>
-                  <Input defaultValue="Doe" />
+                  <Input 
+                    value={profile.lastName}
+                    onChange={(e) => handleInputChange('lastName', e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Email Address</label>
-                  <Input defaultValue="johndoe@example.com" />
+                  <Input 
+                    value={profile.email}
+                    disabled
+                    className="bg-gray-100 cursor-not-allowed"
+                  />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Company</label>
-                  <Input defaultValue="Example Inc." />
+                  <Input 
+                    value={profile.company}
+                    onChange={(e) => handleInputChange('company', e.target.value)}
+                  />
                 </div>
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium">Bio</label>
                 <Textarea 
-                  defaultValue="SEO specialist focused on content optimization and keyword research."
+                  value={profile.bio}
+                  onChange={(e) => handleInputChange('bio', e.target.value)}
                   rows={4}
                 />
               </div>
@@ -82,8 +163,9 @@ const Settings = () => {
               <Button 
                 className="bg-seo-purple hover:bg-seo-purple-dark"
                 onClick={handleSave}
+                disabled={loading}
               >
-                Save Changes
+                {loading ? "Saving..." : "Save Changes"}
               </Button>
             </CardFooter>
           </Card>
