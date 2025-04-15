@@ -21,9 +21,6 @@ const CTA = () => {
               Schedule a Demo
             </Button>
           </div>
-          <p className="mt-6 text-white opacity-75 text-sm">
-            No credit card required. 14-day free trial.
-          </p>
         </div>
       </div>
     </section>
