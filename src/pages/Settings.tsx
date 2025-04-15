@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,25 +38,31 @@ const Settings = () => {
       if (!user) return;
 
       setLoading(true);
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
 
-      if (error) {
-        toast.error("Error fetching profile");
-        console.error(error);
-      } else if (data) {
-        setProfile({
-          firstName: data.first_name || "",
-          lastName: data.last_name || "",
-          email: user.email || "",
-          company: data.company || "",
-          bio: data.bio || ""
-        });
+        if (error) {
+          toast.error("Error fetching profile");
+          console.error(error);
+        } else if (data) {
+          setProfile({
+            firstName: data.first_name || "",
+            lastName: data.last_name || "",
+            email: user.email || "",
+            company: data.company || "",
+            bio: data.bio || ""
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+        toast.error("Failed to load profile data");
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchProfile();
@@ -68,23 +75,29 @@ const Settings = () => {
     }
 
     setLoading(true);
-    const { error } = await supabase
-      .from('profiles')
-      .upsert({
-        id: user.id,
-        first_name: profile.firstName,
-        last_name: profile.lastName,
-        company: profile.company,
-        bio: profile.bio
-      });
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          first_name: profile.firstName,
+          last_name: profile.lastName,
+          company: profile.company,
+          bio: profile.bio
+        });
 
-    if (error) {
-      toast.error("Error updating profile");
-      console.error(error);
-    } else {
-      toast.success("Profile updated successfully!");
+      if (error) {
+        toast.error("Error updating profile");
+        console.error(error);
+      } else {
+        toast.success("Profile updated successfully!");
+      }
+    } catch (error) {
+      console.error("Error saving profile:", error);
+      toast.error("Failed to save profile changes");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const handleInputChange = (field: keyof typeof profile, value: string) => {
