@@ -1,16 +1,19 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { RecommendationType } from "@/hooks/useContentOptimizer";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { AlertCircle, CheckCircle, FileText, AlertTriangle } from "lucide-react";
+import { AlertCircle, CheckCircle, FileText, AlertTriangle, Filter } from "lucide-react";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 interface RecommendationPanelProps {
   recommendations: RecommendationType[];
 }
 
 const RecommendationPanel: React.FC<RecommendationPanelProps> = ({ recommendations }) => {
+  const [filter, setFilter] = useState<string>("all");
+
   const getSeverityColor = (severity: string) => {
     switch (severity) {
       case "high":
@@ -43,7 +46,9 @@ const RecommendationPanel: React.FC<RecommendationPanelProps> = ({ recommendatio
       keywords: { label: "Keywords", color: "bg-green-100 text-green-800 border-green-200" },
       structure: { label: "Structure", color: "bg-blue-100 text-blue-800 border-blue-200" },
       seo: { label: "SEO", color: "bg-indigo-100 text-indigo-800 border-indigo-200" },
-      headline: { label: "Headline", color: "bg-orange-100 text-orange-800 border-orange-200" }
+      headline: { label: "Headline", color: "bg-orange-100 text-orange-800 border-orange-200" },
+      topic: { label: "Topic", color: "bg-pink-100 text-pink-800 border-pink-200" },
+      meta: { label: "Meta Tags", color: "bg-cyan-100 text-cyan-800 border-cyan-200" }
     };
     
     const { label, color } = categories[category] || { label: category, color: "bg-gray-100 text-gray-800 border-gray-200" };
@@ -55,10 +60,22 @@ const RecommendationPanel: React.FC<RecommendationPanelProps> = ({ recommendatio
     );
   };
 
+  const filteredRecommendations = filter === "all" 
+    ? recommendations 
+    : recommendations.filter(rec => rec.category === filter);
+
+  const countByCategory = recommendations.reduce((acc, rec) => {
+    acc[rec.category] = (acc[rec.category] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Content Recommendations</CardTitle>
+        <CardTitle className="flex items-center">
+          <CheckCircle className="h-5 w-5 mr-2 text-seo-purple" />
+          Content Recommendations
+        </CardTitle>
         <CardDescription>
           Apply these suggestions to improve your content's SEO performance
         </CardDescription>
@@ -70,25 +87,50 @@ const RecommendationPanel: React.FC<RecommendationPanelProps> = ({ recommendatio
             <p>Analyze your content to receive recommendations</p>
           </div>
         ) : (
-          <ScrollArea className="h-[500px] pr-4">
-            <div className="space-y-6">
-              {recommendations.map((rec) => (
-                <div key={rec.id} className="border rounded-lg p-4">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center">
-                      {getSeverityIcon(rec.severity)}
-                      <h3 className="font-medium">{rec.title}</h3>
-                    </div>
-                    {getCategoryBadge(rec.category)}
-                  </div>
-                  <p className="text-gray-600 mb-3 text-sm">{rec.description}</p>
-                  <div className={`p-3 rounded-md text-sm ${getSeverityColor(rec.severity)}`}>
-                    <strong>Suggestion:</strong> {rec.improvement}
-                  </div>
-                </div>
-              ))}
+          <>
+            <div className="flex items-center mb-6">
+              <Filter className="h-4 w-4 mr-2 text-gray-500" />
+              <span className="text-sm mr-4">Filter by:</span>
+              <ToggleGroup 
+                type="single" 
+                defaultValue="all"
+                value={filter}
+                onValueChange={(value) => {
+                  if (value) setFilter(value);
+                }}
+                className="justify-start flex-wrap"
+              >
+                <ToggleGroupItem value="all" className="text-xs">
+                  All ({recommendations.length})
+                </ToggleGroupItem>
+                {Object.entries(countByCategory).map(([category, count]) => (
+                  <ToggleGroupItem key={category} value={category} className="text-xs">
+                    {category.charAt(0).toUpperCase() + category.slice(1)} ({count})
+                  </ToggleGroupItem>
+                ))}
+              </ToggleGroup>
             </div>
-          </ScrollArea>
+
+            <ScrollArea className="h-[500px] pr-4">
+              <div className="space-y-6">
+                {filteredRecommendations.map((rec) => (
+                  <div key={rec.id} className="border rounded-lg p-4">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center">
+                        {getSeverityIcon(rec.severity)}
+                        <h3 className="font-medium">{rec.title}</h3>
+                      </div>
+                      {getCategoryBadge(rec.category)}
+                    </div>
+                    <p className="text-gray-600 mb-3 text-sm">{rec.description}</p>
+                    <div className={`p-3 rounded-md text-sm ${getSeverityColor(rec.severity)}`}>
+                      <strong>Suggestion:</strong> {rec.improvement}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+          </>
         )}
       </CardContent>
     </Card>
