@@ -1,6 +1,8 @@
 
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { Provider } from '@supabase/supabase-js';
 
 type User = {
   id: string;
@@ -15,6 +17,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<boolean>;
   signup: (email: string, password: string, firstName: string, lastName: string) => Promise<boolean>;
+  loginWithGoogle: () => Promise<void>;
   logout: () => void;
 }
 
@@ -86,6 +89,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const loginWithGoogle = async () => {
+    try {
+      setIsLoading(true);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin + '/dashboard'
+        }
+      });
+      
+      if (error) {
+        console.error("Google login error:", error);
+        toast.error("Failed to log in with Google");
+      }
+    } catch (error) {
+      console.error("Google login error:", error);
+      toast.error("Failed to log in with Google");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const signup = async (
     email: string, 
     password: string, 
@@ -141,6 +166,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isLoading,
     login,
     signup,
+    loginWithGoogle,
     logout
   };
 
