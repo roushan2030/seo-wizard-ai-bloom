@@ -1,8 +1,6 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Card,
   CardContent,
@@ -11,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { FormField } from "@/components/ui/form-field";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Profile } from "@/types/profile";
@@ -74,44 +73,34 @@ export const ProfileSettings = ({ profile, loading, userId, onProfileChange }: P
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium">First Name</label>
-            <Input 
-              value={profile.firstName}
-              onChange={(e) => onProfileChange('firstName', e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Last Name</label>
-            <Input 
-              value={profile.lastName}
-              onChange={(e) => onProfileChange('lastName', e.target.value)}
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Email Address</label>
-            <Input 
-              value={profile.email}
-              disabled
-              className="bg-gray-100 cursor-not-allowed"
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Company</label>
-            <Input 
-              value={profile.company}
-              onChange={(e) => onProfileChange('company', e.target.value)}
-            />
-          </div>
-        </div>
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Bio</label>
-          <Textarea 
-            value={profile.bio}
-            onChange={(e) => onProfileChange('bio', e.target.value)}
-            rows={4}
+          <FormField
+            label="First Name"
+            value={profile.firstName}
+            onChange={(value) => onProfileChange('firstName', value)}
+          />
+          <FormField
+            label="Last Name"
+            value={profile.lastName}
+            onChange={(value) => onProfileChange('lastName', value)}
+          />
+          <FormField
+            label="Email Address"
+            value={profile.email}
+            type="email"
+            disabled={true}
+          />
+          <FormField
+            label="Company"
+            value={profile.company}
+            onChange={(value) => onProfileChange('company', value)}
           />
         </div>
+        <FormField
+          label="Bio"
+          value={profile.bio}
+          onChange={(value) => onProfileChange('bio', value)}
+          type="textarea"
+        />
       </CardContent>
       <CardFooter>
         <Button 
