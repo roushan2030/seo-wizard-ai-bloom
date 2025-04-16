@@ -88,6 +88,7 @@ export const ProfileSettings = ({ profile, loading, userId, onProfileChange }: P
             value={profile.email}
             type="email"
             disabled={true}
+            onChange={() => {}} // Added empty onChange handler for disabled field
           />
           <FormField
             label="Company"
