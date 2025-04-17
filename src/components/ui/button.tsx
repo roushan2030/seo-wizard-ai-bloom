@@ -49,12 +49,21 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     
     // If this is being rendered as a Link from react-router-dom
     if (Comp === Link) {
+      // Only pass Link-compatible props to the Link component
+      // Extract only the props that are safe to pass to Link
+      const { onClick, className: classNameProp, children, style, target, id, ...restProps } = props;
+      
       return (
         <Link
           to={to!}
           className={cn(buttonVariants({ variant, size, className }))}
-          {...props}
-        />
+          onClick={onClick}
+          style={style}
+          target={target}
+          id={id}
+        >
+          {children}
+        </Link>
       )
     }
     
