@@ -49,22 +49,22 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     
     // If this is being rendered as a Link from react-router-dom
     if (Comp === Link) {
-      // Only pass Link-compatible props to the Link component
-      // Extract only the props that are safe to pass to Link
-      const { onClick, className: classNameProp, children, style, target, id, ...restProps } = props;
+      // Create a type-safe subset of props for the Link component
+      const linkProps: React.ComponentPropsWithoutRef<typeof Link> = {
+        to: to!,
+        className: cn(buttonVariants({ variant, size, className })),
+      }
       
-      return (
-        <Link
-          to={to!}
-          className={cn(buttonVariants({ variant, size, className }))}
-          onClick={onClick}
-          style={style}
-          target={target}
-          id={id}
-        >
-          {children}
-        </Link>
-      )
+      // Only add safe props that can be used with Link
+      if ('onClick' in props) linkProps.onClick = props.onClick as React.MouseEventHandler<HTMLAnchorElement>
+      if ('children' in props) linkProps.children = props.children
+      if ('style' in props) linkProps.style = props.style
+      if ('id' in props) linkProps.id = props.id
+      if ('target' in props) linkProps.target = props.target as string
+      if ('rel' in props) linkProps.rel = props.rel
+      if ('aria-label' in props) linkProps['aria-label'] = props['aria-label'] as string
+      
+      return <Link {...linkProps} />
     }
     
     return (
