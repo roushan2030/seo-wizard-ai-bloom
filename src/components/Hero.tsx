@@ -38,6 +38,8 @@ const Hero = () => {
             <Button 
               type="submit" 
               className="bg-seo-purple hover:bg-seo-purple-dark text-white px-6"
+              as={Link}
+              to="/signup"
             >
               Start Free Trial <ArrowRight size={16} className="ml-2" />
             </Button>

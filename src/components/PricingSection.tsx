@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { Link } from "react-router-dom";
 
 const PricingSection = () => {
   const [isYearly, setIsYearly] = useState(true);
@@ -23,7 +24,8 @@ const PricingSection = () => {
       ],
       ctaText: "Get Started",
       ctaVariant: "outline" as const,
-      accentClass: "bg-gray-100"
+      accentClass: "bg-gray-100",
+      ctaLink: "/signup"
     },
     {
       name: "Pro",
@@ -43,7 +45,8 @@ const PricingSection = () => {
       ctaText: "Start Free Trial",
       ctaVariant: "default" as const,
       popular: true,
-      accentClass: "bg-[#F2FCE2]"
+      accentClass: "bg-[#F2FCE2]",
+      ctaLink: "/signup"
     },
     {
       name: "Business",
@@ -63,7 +66,8 @@ const PricingSection = () => {
       ],
       ctaText: "Start Free Trial",
       ctaVariant: "outline" as const,
-      accentClass: "bg-[#D3E4FD]"
+      accentClass: "bg-[#D3E4FD]",
+      ctaLink: "/signup"
     },
     {
       name: "Enterprise",
@@ -82,7 +86,8 @@ const PricingSection = () => {
       ],
       ctaText: "Contact Sales",
       ctaVariant: "outline" as const,
-      accentClass: "bg-[#FFDEE2]"
+      accentClass: "bg-[#FFDEE2]",
+      ctaLink: "/pricing"
     }
   ];
 
@@ -159,6 +164,8 @@ const PricingSection = () => {
                 <Button 
                   variant={plan.ctaVariant}
                   className={`w-full ${plan.popular && plan.ctaVariant === 'default' ? 'bg-seo-purple hover:bg-seo-purple-dark' : ''}`}
+                  as={Link}
+                  to={plan.ctaLink}
                 >
                   {plan.ctaText}
                 </Button>

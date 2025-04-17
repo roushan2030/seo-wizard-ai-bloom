@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Pricing = () => {
   const [isYearly, setIsYearly] = useState(true);
@@ -19,7 +20,8 @@ const Pricing = () => {
         "Community support"
       ],
       ctaText: "Start Free",
-      ctaVariant: "outline" as const
+      ctaVariant: "outline" as const,
+      ctaLink: "/signup"
     },
     {
       name: "Pro",
@@ -37,6 +39,7 @@ const Pricing = () => {
       ],
       ctaText: "Start Pro Trial",
       ctaVariant: "default" as const,
+      ctaLink: "/signup",
       popular: true
     },
     {
@@ -55,7 +58,8 @@ const Pricing = () => {
         "Dedicated success manager"
       ],
       ctaText: "Start Business Trial",
-      ctaVariant: "outline" as const
+      ctaVariant: "outline" as const,
+      ctaLink: "/signup"
     }
   ];
 
@@ -124,6 +128,8 @@ const Pricing = () => {
               <Button 
                 variant={plan.ctaVariant}
                 className={`w-full mb-6 ${plan.popular && plan.ctaVariant === 'default' ? 'bg-seo-purple hover:bg-seo-purple-dark' : ''}`}
+                as={Link}
+                to={plan.ctaLink}
               >
                 {plan.ctaText}
               </Button>
@@ -141,7 +147,7 @@ const Pricing = () => {
 
         <div className="mt-16 text-center">
           <p className="text-gray-600 mb-4">Need a custom solution for your enterprise?</p>
-          <Button variant="link" className="text-seo-purple hover:text-seo-purple-dark">
+          <Button variant="link" className="text-seo-purple hover:text-seo-purple-dark" as={Link} to="/pricing">
             Contact our sales team
           </Button>
         </div>

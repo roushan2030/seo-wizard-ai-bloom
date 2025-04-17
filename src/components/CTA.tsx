@@ -1,6 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const CTA = () => {
   return (
@@ -14,10 +15,19 @@ const CTA = () => {
             Join thousands of businesses using AI to climb search rankings and drive more organic traffic.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button className="bg-white text-seo-purple hover:bg-gray-100 hover:text-seo-purple-dark px-8 py-6 text-lg">
+            <Button 
+              className="bg-white text-seo-purple hover:bg-gray-100 hover:text-seo-purple-dark px-8 py-6 text-lg"
+              as={Link}
+              to="/signup"
+            >
               Start Your Free Trial <ArrowRight size={18} className="ml-2" />
             </Button>
-            <Button variant="outline" className="bg-[#FFDEE2] text-black border-black hover:bg-[#FFDEE2]/80 px-8 py-6 text-lg">
+            <Button 
+              variant="outline" 
+              className="bg-[#FFDEE2] text-black border-black hover:bg-[#FFDEE2]/80 px-8 py-6 text-lg"
+              as={Link}
+              to="/pricing"
+            >
               Schedule a Demo
             </Button>
           </div>
@@ -28,4 +38,3 @@ const CTA = () => {
 };
 
 export default CTA;
-
