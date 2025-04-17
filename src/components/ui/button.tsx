@@ -56,7 +56,18 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       }
       
       // Only add safe props that can be used with Link
-      if ('onClick' in props) linkProps.onClick = props.onClick as React.MouseEventHandler<HTMLAnchorElement>
+      if ('onClick' in props) {
+        // Explicitly cast the onClick handler to the correct type
+        linkProps.onClick = (
+          (e: React.MouseEvent<HTMLAnchorElement>) => {
+            // The event objects are compatible enough for this use case
+            (props.onClick as React.MouseEventHandler<HTMLElement>)(
+              e as unknown as React.MouseEvent<HTMLButtonElement>
+            )
+          }
+        )
+      }
+      
       if ('children' in props) linkProps.children = props.children
       if ('style' in props) linkProps.style = props.style
       if ('id' in props) linkProps.id = props.id
