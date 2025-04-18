@@ -1,4 +1,3 @@
-
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
@@ -48,24 +47,22 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const Comp = asChild ? Slot : as || "button"
     
     // If this is being rendered as a Link from react-router-dom
-    if (Comp === Link) {
+    if (Comp === Link && to) {
       // Create a type-safe subset of props for the Link component
       const linkProps: React.ComponentPropsWithoutRef<typeof Link> = {
-        to: to!,
+        to,
         className: cn(buttonVariants({ variant, size, className })),
       }
       
       // Only add safe props that can be used with Link
       if ('onClick' in props) {
-        // Explicitly cast the onClick handler to the correct type
-        linkProps.onClick = (
-          (e: React.MouseEvent<HTMLAnchorElement>) => {
-            // The event objects are compatible enough for this use case
+        linkProps.onClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+          if (props.onClick) {
             (props.onClick as React.MouseEventHandler<HTMLElement>)(
               e as unknown as React.MouseEvent<HTMLButtonElement>
             )
           }
-        )
+        }
       }
       
       if ('children' in props) linkProps.children = props.children
