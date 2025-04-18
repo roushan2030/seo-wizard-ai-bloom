@@ -22,7 +22,7 @@ export const SearchInput = ({
         <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
         <Input
           type="text"
-          placeholder="Enter a keyword or topic..."
+          placeholder="Try 'SEO tools', 'content marketing', 'digital strategy'..."
           className="pl-10 pr-4 py-6"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}

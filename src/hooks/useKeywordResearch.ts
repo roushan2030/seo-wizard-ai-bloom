@@ -1,7 +1,8 @@
 import { useState, useCallback } from "react";
 import { KeywordData, KeywordGroup, KeywordResearchFilters } from "@/types/keywords";
-import { generateKeywordData, groupKeywords, exportToCsv, exportToTxt } from "@/services/keywordService";
+import { groupKeywords, exportToCsv, exportToTxt } from "@/services/keywordService";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const DEFAULT_FILTERS: KeywordResearchFilters = {
   sortBy: "relevance",
@@ -20,14 +21,22 @@ export const useKeywordResearch = () => {
     
     setIsLoading(true);
     try {
-      // Generate keywords (in a real app, this could be an API call)
-      console.log(`Generating keywords for: ${searchTerm}`);
+      console.log(`Generating AI keywords for: ${searchTerm}`);
       
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Call the Supabase edge function to generate keywords
+      const { data, error } = await supabase.functions.invoke('generate-keywords', {
+        body: { keyword: searchTerm }
+      });
       
-      // Generate keywords
-      const results = generateKeywordData(searchTerm);
+      if (error) {
+        throw new Error(error.message);
+      }
+      
+      if (!data || !data.keywords || !Array.isArray(data.keywords)) {
+        throw new Error("Invalid response from keyword generation");
+      }
+      
+      const results: KeywordData[] = data.keywords;
       
       // Group the keywords
       const groups = groupKeywords(results);
