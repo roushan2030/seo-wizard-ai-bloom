@@ -1,5 +1,4 @@
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -18,6 +17,24 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
 import { 
   Search, 
   TrendingUp, 
@@ -25,78 +42,28 @@ import {
   BarChart3, 
   ArrowRight, 
   Plus, 
-  Info 
+  Info,
+  Copy,
+  Download,
+  Filter,
+  RefreshCw
 } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+
+import { useKeywordResearch } from "@/hooks/useKeywordResearch";
+import { KeywordGroups } from "@/components/dashboard/KeywordGroups";
 
 const KeywordResearch = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [keywordResults, setKeywordResults] = useState([
-    {
-      keyword: "ai seo tools",
-      volume: 6500,
-      difficulty: 68,
-      trend: "up",
-      cpc: 4.75,
-      serp: ["SEMrush", "Ahrefs", "Moz", "SEO.ai"]
-    },
-    {
-      keyword: "best seo ai software",
-      volume: 3200,
-      difficulty: 52,
-      trend: "up",
-      cpc: 5.85,
-      serp: ["TechRadar", "G2", "Capterra", "SEO.ai"]
-    },
-    {
-      keyword: "content optimization with ai",
-      volume: 2100,
-      difficulty: 45,
-      trend: "up",
-      cpc: 3.95,
-      serp: ["HubSpot", "ContentIQ", "SEO.ai", "WordAI"]
-    },
-    {
-      keyword: "ai keyword research",
-      volume: 8400,
-      difficulty: 71,
-      trend: "up",
-      cpc: 6.25,
-      serp: ["Ahrefs", "SEMrush", "SEO.ai", "KeywordTool"]
-    },
-    {
-      keyword: "seo analytics platform",
-      volume: 1800,
-      difficulty: 63,
-      trend: "stable",
-      cpc: 4.50,
-      serp: ["Google Analytics", "SEMrush", "Moz", "SEO.ai"]
-    }
-  ]);
-
-  const handleSearch = () => {
-    if (!searchTerm.trim()) return;
-    
-    setIsLoading(true);
-    
-    // Simulating API call
-    setTimeout(() => {
-      // In a real app, this would be replaced with an actual API call
-      console.log(`Searching for: ${searchTerm}`);
-      
-      // Example of how you might use OpenAI API to generate keywords
-      // const response = await fetch('/api/generate-keywords', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ searchTerm })
-      // });
-      // const data = await response.json();
-      // setKeywordResults(data.keywords);
-      
-      setIsLoading(false);
-    }, 1500);
-  };
+  const {
+    searchTerm,
+    setSearchTerm,
+    isLoading,
+    keywordResults,
+    keywordGroups,
+    handleSearch,
+    filteredKeywords,
+    copyToClipboard,
+    exportKeywords,
+  } = useKeywordResearch();
 
   const getDifficultyColor = (difficulty: number) => {
     if (difficulty < 30) return "text-green-600";
@@ -136,83 +103,155 @@ const KeywordResearch = () => {
             className="bg-seo-purple hover:bg-seo-purple-dark whitespace-nowrap"
             disabled={isLoading}
           >
-            {isLoading ? "Searching..." : "Research Keywords"}
+            {isLoading ? (
+              <>
+                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                Analyzing...
+              </>
+            ) : (
+              "Research Keywords"
+            )}
           </Button>
         </div>
 
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[300px]">Keyword</TableHead>
-              <TableHead>
-                <div className="flex items-center">
-                  Volume
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Info className="h-3 w-3 ml-1 text-gray-400" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Monthly search volume</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-              </TableHead>
-              <TableHead>
-                <div className="flex items-center">
-                  Difficulty
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Info className="h-3 w-3 ml-1 text-gray-400" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>SEO difficulty score (0-100)</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-              </TableHead>
-              <TableHead>Trend</TableHead>
-              <TableHead>CPC ($)</TableHead>
-              <TableHead>Action</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {keywordResults.map((keyword, index) => (
-              <TableRow key={index}>
-                <TableCell className="font-medium">{keyword.keyword}</TableCell>
-                <TableCell>{keyword.volume.toLocaleString()}</TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <span className={getDifficultyColor(keyword.difficulty)}>
-                      {keyword.difficulty}
-                    </span>
-                    <span className="text-xs text-gray-500">
-                      ({getDifficultyLabel(keyword.difficulty)})
-                    </span>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  {keyword.trend === "up" ? (
-                    <TrendingUp className="h-5 w-5 text-green-600" />
-                  ) : keyword.trend === "down" ? (
-                    <TrendingDown className="h-5 w-5 text-red-600" />
-                  ) : (
-                    <BarChart3 className="h-5 w-5 text-yellow-600" />
-                  )}
-                </TableCell>
-                <TableCell>${keyword.cpc.toFixed(2)}</TableCell>
-                <TableCell>
-                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        {keywordResults.length > 0 && (
+          <Tabs defaultValue="list">
+            <div className="flex justify-between items-center mb-4">
+              <TabsList>
+                <TabsTrigger value="list">List View</TabsTrigger>
+                <TabsTrigger value="groups">Group View</TabsTrigger>
+              </TabsList>
+              <div className="flex gap-2">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <Filter className="h-4 w-4 mr-2" />
+                      Filter
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem>
+                      Sort by volume (high to low)
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      Sort by volume (low to high)
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      Sort by difficulty (easy first)
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      Sort by CPC (high to low)
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <Download className="h-4 w-4 mr-2" />
+                      Export
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => exportKeywords("csv")}>
+                      Export as CSV
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => exportKeywords("txt")}>
+                      Export as TXT
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </div>
+
+            <TabsContent value="list" className="mt-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[300px]">Keyword</TableHead>
+                    <TableHead>
+                      <div className="flex items-center">
+                        Volume
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Info className="h-3 w-3 ml-1 text-gray-400" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Monthly search volume</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
+                    </TableHead>
+                    <TableHead>
+                      <div className="flex items-center">
+                        Difficulty
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Info className="h-3 w-3 ml-1 text-gray-400" />
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>SEO difficulty score (0-100)</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </div>
+                    </TableHead>
+                    <TableHead>Trend</TableHead>
+                    <TableHead>CPC ($)</TableHead>
+                    <TableHead>Action</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredKeywords().map((keyword, index) => (
+                    <TableRow key={index}>
+                      <TableCell className="font-medium">{keyword.keyword}</TableCell>
+                      <TableCell>{keyword.volume.toLocaleString()}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <span className={getDifficultyColor(keyword.difficulty)}>
+                            {keyword.difficulty}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            ({getDifficultyLabel(keyword.difficulty)})
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {keyword.trend === "up" ? (
+                          <TrendingUp className="h-5 w-5 text-green-600" />
+                        ) : keyword.trend === "down" ? (
+                          <TrendingDown className="h-5 w-5 text-red-600" />
+                        ) : (
+                          <BarChart3 className="h-5 w-5 text-yellow-600" />
+                        )}
+                      </TableCell>
+                      <TableCell>${keyword.cpc.toFixed(2)}</TableCell>
+                      <TableCell>
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-8 w-8 p-0"
+                          onClick={() => copyToClipboard(keyword.keyword)}
+                        >
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TabsContent>
+
+            <TabsContent value="groups" className="mt-0">
+              <KeywordGroups 
+                groups={keywordGroups} 
+                onCopyKeyword={copyToClipboard} 
+              />
+            </TabsContent>
+          </Tabs>
+        )}
       </CardContent>
       <CardFooter className="flex justify-between">
         <p className="text-sm text-gray-500">
