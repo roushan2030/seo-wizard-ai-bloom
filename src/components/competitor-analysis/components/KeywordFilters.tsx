@@ -4,11 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Filter } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { KeywordFilters } from "../types";
+import type { KeywordFilters as KeywordFiltersType } from "../types";
 
 interface KeywordFiltersProps {
-  filters: KeywordFilters;
-  onFiltersChange: (filters: KeywordFilters) => void;
+  filters: KeywordFiltersType;
+  onFiltersChange: (filters: KeywordFiltersType) => void;
 }
 
 export const KeywordFilters = ({ filters, onFiltersChange }: KeywordFiltersProps) => {
@@ -32,7 +32,7 @@ export const KeywordFilters = ({ filters, onFiltersChange }: KeywordFiltersProps
             <h4 className="font-medium mb-2">Filter by position</h4>
             <Select 
               value={filters.position} 
-              onValueChange={(value: KeywordFilters["position"]) => 
+              onValueChange={(value: KeywordFiltersType["position"]) => 
                 onFiltersChange({ ...filters, position: value })
               }
             >
