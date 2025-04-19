@@ -18,6 +18,7 @@ const CompetitorAnalysis = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [analyzedDomain, setAnalyzedDomain] = useState("");
   const [hasResults, setHasResults] = useState(false);
+  const [keywordData, setKeywordData] = useState<any[]>([]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,6 +37,48 @@ const CompetitorAnalysis = () => {
       setHasResults(true);
       toast.success(`Domain ${domain} analyzed successfully`);
     }, 1500);
+  };
+
+  // Handle exporting the data to CSV
+  const exportToCsv = () => {
+    if (!keywordData || keywordData.length === 0) {
+      toast.error("No data to export");
+      return;
+    }
+
+    // Create CSV header
+    const headers = ["Keyword", "Position", "Volume", "Difficulty", "Trend", "URL"];
+    
+    // Convert data to CSV rows
+    const rows = keywordData.map(kw => [
+      kw.keyword,
+      kw.position,
+      kw.volume,
+      kw.difficulty,
+      kw.trend,
+      kw.url
+    ]);
+    
+    // Combine header and rows
+    const csvContent = [
+      headers.join(","),
+      ...rows.map(row => row.join(","))
+    ].join("\n");
+    
+    // Create download link
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    const filename = `${analyzedDomain}-keywords-${country}.csv`;
+    
+    link.setAttribute("href", url);
+    link.setAttribute("download", filename);
+    link.style.display = "none";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast.success("CSV file downloaded successfully");
   };
 
   return (
@@ -146,13 +189,17 @@ const CompetitorAnalysis = () => {
                       Top ranking keywords for this domain
                     </CardDescription>
                   </div>
-                  <Button variant="outline" size="sm" className="whitespace-nowrap">
+                  <Button variant="outline" size="sm" className="whitespace-nowrap" onClick={exportToCsv}>
                     <Download className="h-4 w-4 mr-2" /> Export CSV
                   </Button>
                 </div>
               </CardHeader>
               <CardContent className="p-0">
-                <CompetitorKeywordRankings domain={analyzedDomain} country={country} />
+                <CompetitorKeywordRankings 
+                  domain={analyzedDomain} 
+                  country={country} 
+                  onDataLoaded={setKeywordData}
+                />
               </CardContent>
             </>
           )}
