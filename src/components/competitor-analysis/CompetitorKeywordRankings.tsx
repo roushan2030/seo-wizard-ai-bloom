@@ -35,7 +35,7 @@ export const CompetitorKeywordRankings = ({ domain, country }: CompetitorKeyword
   const [isLoading, setIsLoading] = useState(true);
   const [keywords, setKeywords] = useState<KeywordRanking[]>([]);
   const [filterKeyword, setFilterKeyword] = useState("");
-  const [positionFilter, setPositionFilter] = useState("");
+  const [positionFilter, setPositionFilter] = useState("all");
   const [sortColumn, setSortColumn] = useState<keyof KeywordRanking>("position");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
@@ -66,7 +66,7 @@ export const CompetitorKeywordRankings = ({ domain, country }: CompetitorKeyword
         const keywordMatch = filterKeyword === "" || 
           kw.keyword.toLowerCase().includes(filterKeyword.toLowerCase());
           
-        const positionMatch = positionFilter === "" || 
+        const positionMatch = positionFilter === "all" || 
           (positionFilter === "1-3" && kw.position >= 1 && kw.position <= 3) ||
           (positionFilter === "4-10" && kw.position >= 4 && kw.position <= 10) ||
           (positionFilter === "11-20" && kw.position >= 11 && kw.position <= 20) ||
@@ -144,7 +144,7 @@ export const CompetitorKeywordRankings = ({ domain, country }: CompetitorKeyword
                         <SelectValue placeholder="All positions" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">All positions</SelectItem>
+                        <SelectItem value="all">All positions</SelectItem>
                         <SelectItem value="1-3">Positions 1-3</SelectItem>
                         <SelectItem value="4-10">Positions 4-10</SelectItem>
                         <SelectItem value="11-20">Positions 11-20</SelectItem>
