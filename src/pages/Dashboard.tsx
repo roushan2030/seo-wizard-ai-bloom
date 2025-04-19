@@ -3,11 +3,31 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FileText } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import DashboardOverview from "@/components/dashboard/DashboardOverview";
 import { KeywordsTabContent, ContentTabContent, CompetitorsTabContent } from "@/components/dashboard/DashboardTabContent";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("overview");
+  const navigate = useNavigate();
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    switch (value) {
+      case "keywords":
+        navigate("/dashboard/keywords");
+        break;
+      case "content":
+        navigate("/dashboard/content");
+        break;
+      case "competitors":
+        navigate("/dashboard/competitors");
+        break;
+      default:
+        // Stay on dashboard for overview
+        break;
+    }
+  };
 
   return (
     <div className="p-4 md:p-8">
@@ -23,7 +43,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">
+      <Tabs defaultValue={activeTab} onValueChange={handleTabChange} className="w-full">
         <TabsList className="mb-6">
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="keywords">Keywords</TabsTrigger>
