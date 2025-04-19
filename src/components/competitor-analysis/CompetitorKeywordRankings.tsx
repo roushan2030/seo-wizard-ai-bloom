@@ -1,4 +1,3 @@
-
 import { useState, useMemo, useEffect } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ArrowUp, ArrowDown, Filter } from "lucide-react";
@@ -29,9 +28,10 @@ interface KeywordRanking {
 interface CompetitorKeywordRankingsProps {
   domain: string;
   country: string;
+  onDataLoaded?: (data: KeywordRanking[]) => void;
 }
 
-export const CompetitorKeywordRankings = ({ domain, country }: CompetitorKeywordRankingsProps) => {
+export const CompetitorKeywordRankings = ({ domain, country, onDataLoaded }: CompetitorKeywordRankingsProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [keywords, setKeywords] = useState<KeywordRanking[]>([]);
   const [filterKeyword, setFilterKeyword] = useState("");
@@ -48,7 +48,12 @@ export const CompetitorKeywordRankings = ({ domain, country }: CompetitorKeyword
     setKeywords(data);
     setIsLoading(false);
     
-  }, [domain, country]);
+    // Call onDataLoaded callback if provided
+    if (onDataLoaded) {
+      onDataLoaded(data);
+    }
+    
+  }, [domain, country, onDataLoaded]);
 
   const handleSort = (column: keyof KeywordRanking) => {
     if (sortColumn === column) {
