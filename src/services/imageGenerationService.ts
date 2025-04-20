@@ -19,7 +19,7 @@ export const generateDashboardPreview = async (apiKey: string) => {
         {
           taskType: 'imageInference',
           taskUUID: crypto.randomUUID(),
-          positivePrompt: "Minimalist modern SEO analytics dashboard, showing graphs, charts and statistics in a clean design. Professional UI with purple and white color scheme, dark mode interface with data visualizations.",
+          positivePrompt: "Ultramodern SaaS analytics dashboard with sleek, minimalist design. High-end UI featuring real-time data visualizations, dark theme with gradient accents, clean typography, and 3D charts. Emphasize modern metrics, KPIs, and professional data presentation with blur effects and glass morphism.",
           model: "runware:100@1",
           width: 1200,
           height: 600,
