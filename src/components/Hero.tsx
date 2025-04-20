@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -14,7 +15,8 @@ const Hero = () => {
     const fetchDashboardPreview = async () => {
       try {
         setIsGeneratingImage(true);
-        const apiKey = Deno.env.get('RUNWARE_API_KEY');
+        // Use import.meta.env instead of Deno.env
+        const apiKey = import.meta.env.VITE_RUNWARE_API_KEY;
         if (!apiKey) {
           throw new Error('Runware API key is not set');
         }
