@@ -1,16 +1,18 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
+import { generateDashboardPreview } from "@/services/imageGenerationService";
+import { toast } from "sonner";
 
 const Hero = () => {
   const [email, setEmail] = useState("");
+  const [dashboardImage, setDashboardImage] = useState("https://placehold.co/1200x600/f5f7fa/a6acbe?text=SEO.ai+Dashboard+Preview");
+  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Email submitted:", email);
-    // Here you would handle the signup logic
   };
 
   return (
@@ -66,7 +68,7 @@ const Hero = () => {
           <div className="absolute inset-0 bg-seo-gradient opacity-10 blur-xl rounded-xl"></div>
           <div className="relative bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-200">
             <img 
-              src="https://placehold.co/1200x600/f5f7fa/a6acbe?text=SEO.ai+Dashboard+Preview" 
+              src={dashboardImage}
               alt="SEO.ai Dashboard Preview" 
               className="w-full h-auto"
             />
