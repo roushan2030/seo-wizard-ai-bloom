@@ -24,6 +24,15 @@ export const generateDashboardPreview = async (apiKey: string) => {
   });
 
   const data = await response.json();
-  if (data.error) throw new Error(data.error);
-  return data.data[1]?.imageURL;
+  
+  if (data.error) {
+    throw new Error(data.error);
+  }
+
+  const imageUrl = data.data[1]?.imageURL;
+  if (!imageUrl) {
+    throw new Error('No image URL found in the response');
+  }
+
+  return imageUrl;
 };
